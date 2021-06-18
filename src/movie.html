@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <style>
+    img {
+      width: 200px;
+      height: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <input type="text" v-model="query">
+    <ul>
+      <li v-for="item in filteredItems">
+        <img :src="getPosterPath(item.poster_path)" alt="">
+        <p><strong>{{ item.title }}</strong></p>
+        <p>{{ item.overview }}</p>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        query: '',
+        items: [],
+        filteredItems: []
+      },
+      created: function () {
+        this.getData();
+      },
+      watch: {
+        query: function (val) {
+          if (val == '') {
+            this.filteredItems = this.items;
+          } else {
+            this.filteredItems = this.items
+              .filter(item => item.title.toLowerCase().includes(val.toLowerCase()));
+          }
+        }
+      },
+      methods: {
+        getPosterPath: function (path) {
+          return 'https://image.tmdb.org/t/p/w500' + path;
+        },
+        getData: function () {
+          axios.get('https://api.themoviedb.org/3/movie/upcoming?api_key=a64533e7ece6c72731da47c9c8bc691f&language=ko-KR&page=1')
+            .then((response) => {
+              console.log(response.data.results);
+              this.items = response.data.results;
+              this.filteredItems = this.items;
+            });
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
